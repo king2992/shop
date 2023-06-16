@@ -1,3 +1,4 @@
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Navbar, Container, Nav} from 'react-bootstrap'
 import './App.css'
@@ -5,11 +6,19 @@ import data from './data.js';
 import {useState} from 'react';
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom'
 import Detail from './detail';
+import Inven from './inven';
+import Cart from './cart';
+import Age from './age';
+import axios from 'axios';
+
+export let Context1 = React.createContext();
 
 function App(){
   let navigate = useNavigate()
 
-  let [shoes] = useState(data);
+  let [inven, setInven] = useState([10, 11, 12])
+
+  let [shoes, setShoes] = useState(data);
 
     return (
       <div>
@@ -46,7 +55,25 @@ function App(){
             <Route path="one" element={ <div>첫 주문시 양배추즙 서비스</div> } />
             <Route path="two" element={ <div>생일기념 쿠폰받기</div> } />     
           </Route>
+          <Route path="inven" element={
+            <Context1.Provider value={{ inven, shoes }}>
+              <Inven shoes={shoes} />
+            </Context1.Provider>
+          } />
+          <Route path="cart" element={<Cart/>}/>
+          <Route path="age" element={<Age/>}/>
         </Routes>
+        <button type='buton' onClick={() => {
+                axios.get('https://codingapple1.github.io/shop/data2.json').then((res) => {
+                    console.log(res.data)
+                    let copy = [...shoes];
+                    let result = copy.concat(res.data);
+                    setShoes(result);
+                })
+                .catch(() => {
+                    console.log('실패함')
+                })
+            }}>상품 불러오기</button>
       </div>
     )
 }
